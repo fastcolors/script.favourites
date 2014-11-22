@@ -64,8 +64,10 @@ class Main:
                 if self.PLAY:
                     if 'playlists/music' in path:
                         path = path.replace( 'ActivateWindow(10502,', 'PlayMedia(' )
+                        abspath = abspath.replace( 'ActivateWindow(10502,', '')
                     else:
                         path = path.replace( 'ActivateWindow(10025,', 'PlayMedia(' )
+                        abspath = abspath.replace( 'ActivateWindow(10025,', '')
             else:
                 try:
                     thumb = favourite.attributes[ 'thumb' ].nodeValue
@@ -74,6 +76,7 @@ class Main:
             self.WINDOW.setProperty( "favourite.%d.path" % ( count + 1, ) , path )
             self.WINDOW.setProperty( "favourite.%d.name" % ( count + 1, ) , name )
             self.WINDOW.setProperty( "favourite.%d.thumb" % ( count + 1, ) , thumb )
+            self.WINDOW.setProperty( "favourite.%d.list" % ( count + 1, ) , abspath )
 
 class MainGui( xbmcgui.WindowXMLDialog ):
     def __init__( self, *args, **kwargs ):
@@ -130,13 +133,19 @@ class MainGui( xbmcgui.WindowXMLDialog ):
             if num > 0:
                 fav_path = self.fav_list.getSelectedItem().getProperty( "Path" )
                 fav_label = self.fav_list.getSelectedItem().getLabel()
+                fav_abspath = fav_path
                 if 'playlists/music' in fav_path or 'playlists/video' in fav_path:
                     retBool = xbmcgui.Dialog().yesno(xbmc.getLocalizedString(559), __language__(32000))
                     if retBool:
                         if 'playlists/music' in fav_path:
                             fav_path = fav_path.replace( 'ActivateWindow(10502,', 'PlayMedia(' )
+                            fav_abspath = fav_abspath.replace( 'ActivateWindow(10502,', '')
                         else:
                             fav_path = fav_path.replace( 'ActivateWindow(10025,', 'PlayMedia(' )
+                            fav_abspath = fav_abspath.replace( 'ActivateWindow(10025,', '')
+                if 'ActivateWindow(10502,' in fav_abspath or 'ActivateWindow(10025,' in fav_abspath:
+                    fav_abspath = fav_abspath.replace( 'ActivateWindow(10502,', '')
+                    fav_abspath = fav_abspath.replace( 'ActivateWindow(10025,', '')
                 if self.changetitle == "true":
                     keyboard = xbmc.Keyboard( fav_label, xbmc.getLocalizedString(528), False )
                     keyboard.doModal()
@@ -144,6 +153,7 @@ class MainGui( xbmcgui.WindowXMLDialog ):
                         fav_label = keyboard.getText()
                 xbmc.executebuiltin( 'Skin.SetString(%s,%s)' % ( '%s.%s' % ( self.property, "Path", ), fav_path.decode('string-escape'), ) )
                 xbmc.executebuiltin( 'Skin.SetString(%s,%s)' % ( '%s.%s' % ( self.property, "Label", ), fav_label, ) )
+                xbmc.executebuiltin( 'Skin.SetString(%s,%s)' % ( '%s.%s' % ( self.property, "List", ), fav_abspath.decode('string-escape'), ) )
                 fav_icon = self.fav_list.getSelectedItem().getProperty( "Icon" )
                 if fav_icon:
                     xbmc.executebuiltin( 'Skin.SetString(%s,%s)' % ( '%s.%s' % ( self.property, "Icon", ), fav_icon, ) )
@@ -153,6 +163,7 @@ class MainGui( xbmcgui.WindowXMLDialog ):
                 xbmc.executebuiltin( 'Skin.Reset(%s)' % '%s.%s' % ( self.property, "Path", ) )
                 xbmc.executebuiltin( 'Skin.Reset(%s)' % '%s.%s' % ( self.property, "Label", ) )
                 xbmc.executebuiltin( 'Skin.Reset(%s)' % '%s.%s' % ( self.property, "Icon", ) )
+                xbmc.executebuiltin( 'Skin.Reset(%s)' % '%s.%s' % ( self.property, "List", ) )
                 xbmc.sleep(300)
                 self.close()
 
