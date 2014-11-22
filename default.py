@@ -56,6 +56,7 @@ class Main:
         for count, favourite in enumerate(listing):
             name = favourite.attributes[ 'name' ].nodeValue
             path = favourite.childNodes [ 0 ].nodeValue
+            abspath = path
             if ('RunScript' not in path) and ('StartAndroidActivity' not in path) and ('pvr://' not in path) and (',return' not in path):
                 path = path.rstrip(')')
                 path = path + ',return)'
